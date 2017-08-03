@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>iframe</title>
+    <link rel="stylesheet" href="./css/iconfont.css">
+    <link rel="stylesheet" href="./css/public.css">
+    <link rel="stylesheet" href="./css/iframe.css">
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="user">
+            <div class="avatar f-l">&#xe697;</div>
+            Moca Lin &#xe6d1;
+            <div class="f-r">&#xe606;</div>
+        </div>
+    </div>
+    <div class="main">
+        <div class="main-top">
+            <div class="mainName">
+                学生成绩管理
+                <p>本页面用于操作管理学生成绩</p>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="title">
+                学生成绩管理
+            </div>
+            <div class="nav">
+                <div class="jumpPage">
+                    <input type="text" class="page">
+                    <div class="f-r change">&#xe601;</div>
+                </div><span>页</span>
+                <div class="searchBtn f-r">
+                    <input type="button" value="搜索" class="btn">
+                </div>
+                <div class="search f-r">
+                    <input type="text" placeholder="Search..." class="inp">
+                </div>
+            </div>
+            <div class="table">
+                <table>
+                    <thead></thead>
+                    <tbody></tbody>
+                    <tfooter></tfooter>
+                </table>
+            </div>
+            <div class="select f-l">
+                <input type="button" value="全选" class="selectAll">
+                <input type="button" value="反选" class="selectInvert">
+            </div>
+            <div class="tabs f-r">
+                <div class="next f-r">下一页 &#xe60f;</div>
+                <div class="tabs-detail f-r"></div>
+                <div class="back f-r">上一页</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script src="js/jquery.min.js"></script>
+<script src="js/data.js"></script>
+<script>
+    //初始化 
+
+    //变量声明
+    var num, j = data.length,
+        b, d, amount = 10,
+        s = 1,
+        z, pageT, pageL;
+    pageT = Math.ceil(j / amount);
+    pageL = Math.floor(j / amount);
+
+    //初始显示
+    //thead
+    var title = ['ID &#xe608', '姓名', '性别', '年龄', '成绩', '手机号'];
+    for (var i = 0; i < title.length; i++) {
+        $("thead").append("<th>" + title[i] + "</th>");
+    }
+    for (b = 0; b < amount; b++) {
+        var str = "<td>" + data[b]['Id'] + "</td>";
+        str += "<td>" + data[b]['Name'] + "</td>";
+        str += "<td>" + data[b]['Gender'] + "</td>";
+        str += "<td>" + data[b]['Age'] + "</td>";
+        str += "<td>" + data[b]['Grade'] + "</td>";
+        str += "<td>" + data[b]['Tel'] + "</td>";
+        $("tbody").append("<tr>" + str + "</tr>");
+    }
+
+    //页数少于5页时页码全部显示
+    if (pageT < 5) {
+        for (s = 1; s <= pageT; s++) {
+            $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+        }
+    } else {
+        for (s = 1; s < 3; s++) {
+            $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+        }
+        for (s = 3; s < pageT - 1; s++) {
+            $(".tabs-detail").append("<div class=\"pagenum hide\">" + "" + "</div>");
+        }
+        for (s = pageT - 1; s <= pageT; s++) {
+            $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+        }
+    }
+    //全选
+    $(".selectAll").click(function() {
+        $("tbody tr").addClass("c");
+    })
+    //反选
+    $(".selectInvert").click(function() {
+        $("tbody tr.c").addClass("y").siblings().addClass("c");
+        $("tbody tr.c.y").removeClass("c y");
+
+    })
+
+    //页码点击
+    $(".pagenum").eq(0).addClass("h");
+    $(".pagenum").click(function() {
+        //点击数字跳转页面 
+        d = $(this).html();
+        //获取当前也数值
+        console.log(d);
+        $("tr").remove();
+        for (b = 0; b < data.length; b++) {
+            if (b >= (d - 1) * amount && b < (d) * amount) {
+                var str = "<td>" + data[b]['Id'] + "</td>";
+                str += "<td>" + data[b]['Name'] + "</td>";
+                str += "<td>" + data[b]['Gender'] + "</td>";
+                str += "<td>" + data[b]['Age'] + "</td>";
+                str += "<td>" + data[b]['Grade'] + "</td>";
+                str += "<td>" + data[b]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+        }
+        $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+        //拖拽 
+        $("tr").mousedown(function() {
+            if (event.button == 0) {
+                $(this).addClass("c");
+            } else {
+                $(this).addClass("h").siblings("tr").removeClass("h");
+                $(window).keydown(function(e) {
+                    if (e.keyCode == 8) {
+                        $("tr.c").remove();
+                    }
+                })
+                $(window).mousemove(function(e) {
+                    $(window).mouseup(function() {
+                        $("tbody").append($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("tr").mouseup(function() {
+                        $(this).after($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("thead").mouseup(function() {
+                        $("tbody").prepend($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+
+                    $("tr.h").css({
+                        "left": e.pageX + 100,
+                        "top": e.pageY
+                    })
+                })
+            }
+
+
+        })
+    })
+    //d 当前页数值
+    var d = $(this).index() + 2;
+    //下一页
+    $(".next").click(function() {
+        if (d < pageT) {
+            d++;
+
+        } else {
+            d = pageT;
+        }
+        $("tr").remove();
+        for (b = 0; b < data.length; b++) {
+            if (b >= (d - 1) * amount && b < d * amount) {
+                var str = "<td>" + data[b]['Id'] + "</td>";
+                str += "<td>" + data[b]['Name'] + "</td>";
+                str += "<td>" + data[b]['Gender'] + "</td>";
+                str += "<td>" + data[b]['Age'] + "</td>";
+                str += "<td>" + data[b]['Grade'] + "</td>";
+                str += "<td>" + data[b]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+        }
+        $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+        //拖拽 
+        $("tr").mousedown(function() {
+            if (event.button == 0) {
+                $(this).addClass("c");
+            } else {
+                $(this).addClass("h").siblings("tr").removeClass("h");
+                $(window).keydown(function(e) {
+                    if (e.keyCode == 8) {
+                        $("tr.c").remove();
+                    }
+                })
+                $(window).mousemove(function(e) {
+                    $(window).mouseup(function() {
+                        $("tbody").append($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("tr").mouseup(function() {
+                        $(this).after($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("thead").mouseup(function() {
+                        $("tbody").prepend($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+
+                    $("tr.h").css({
+                        "left": e.pageX + 100,
+                        "top": e.pageY
+                    })
+                })
+            }
+
+
+        })
+    })
+    //上一页
+    $(".back").click(function() {
+        if (d > 1) {
+            d--;
+        } else {
+            d = 1;
+        }
+        $("tr").remove();
+        for (b = 0; b < data.length; b++) {
+            if (b >= (d - 1) * amount && b < d * amount) {
+                var str = "<td>" + data[b]['Id'] + "</td>";
+                str += "<td>" + data[b]['Name'] + "</td>";
+                str += "<td>" + data[b]['Gender'] + "</td>";
+                str += "<td>" + data[b]['Age'] + "</td>";
+                str += "<td>" + data[b]['Grade'] + "</td>";
+                str += "<td>" + data[b]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+        }
+        $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+        //拖拽 
+        $("tr").mousedown(function() {
+            if (event.button == 0) {
+                $(this).addClass("c");
+            } else {
+                $(this).addClass("h").siblings("tr").removeClass("h");
+                $(window).keydown(function(e) {
+                    if (e.keyCode == 8) {
+                        $("tr.c").remove();
+                    }
+                })
+                $(window).mousemove(function(e) {
+                    $(window).mouseup(function() {
+                        $("tbody").append($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("tr").mouseup(function() {
+                        $(this).after($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("thead").mouseup(function() {
+                        $("tbody").prepend($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+
+                    $("tr.h").css({
+                        "left": e.pageX + 100,
+                        "top": e.pageY
+                    })
+                })
+            }
+
+
+        })
+    })
+    //删除
+    $(window).keydown(function(e) {
+        if (e.keyCode == 8) {
+            $("tr.c").hide();
+        }
+    })
+
+    //拖拽 
+    $("tr").mousedown(function() {
+        if (event.button == 0) {
+            $(this).addClass("c");
+        } else {
+            $(this).addClass("h").siblings("tr").removeClass("h");
+            $(window).keydown(function(e) {
+                if (e.keyCode == 8) {
+                    $("tr.c").remove();
+                }
+            })
+            $(window).mousemove(function(e) {
+                $(window).mouseup(function() {
+                    $("tbody").append($("tr.h"));
+                    $("tr.h").removeClass("h");
+                })
+                $("tr").mouseup(function() {
+                    $(this).after($("tr.h"));
+                    $("tr.h").removeClass("h");
+                })
+                $("thead").mouseup(function() {
+                    $("tbody").prepend($("tr.h"));
+                    $("tr.h").removeClass("h");
+                })
+
+                $("tr.h").css({
+                    "left": e.pageX + 100,
+                    "top": e.pageY
+                })
+            })
+        }
+
+
+    })
+
+    //搜索关键字  
+    $(".btn").click(function() {
+        $("tr").remove();
+        for (b = 0; b < data.length; b++) {
+            if (b >= (d - 1) * amount && b < d * amount) {
+                var str = "<td>" + data[b]['Id'] + "</td>";
+                str += "<td>" + data[b]['Name'] + "</td>";
+                str += "<td>" + data[b]['Gender'] + "</td>";
+                str += "<td>" + data[b]['Age'] + "</td>";
+                str += "<td>" + data[b]['Grade'] + "</td>";
+                str += "<td>" + data[b]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+        }
+        z = $(".inp").val();
+        for (var i = 0; i < data.length * 6; i++) {
+            var str = $("td").eq(i).html(); //单字查找
+
+            var nw = str.replace(new RegExp(z, "gm"), "<font color='red' >" + z + "</font>") //替换关键字并改为红色
+            $("td").eq(i).html(nw);
+        }
+    })
+
+    //反向排序
+    $("thead th").eq(0).toggle(function() {
+        $("tr").remove();
+
+        for (var i = (d - 1) * amount; i < d * amount; i++) {
+            if (i < pageL * amount) {
+                for (var a = i + 1; a < d * amount; a++) {
+                    if (data[i].Id < data[a].Id) {
+                        var t = data[a];
+                        data[a] = data[i];
+                        data[i] = t;
+                    }
+                }
+            } else {
+                for (var a = i + 1; a < data.length; a++) {
+                    if (data[i].Id < data[a].Id) {
+                        var t = data[a];
+                        data[a] = data[i];
+                        data[i] = t;
+                    }
+                }
+            }
+
+
+        }
+        for (var i = (d - 1) * amount; i < d * amount; i++) {
+            var str = "<td>" + data[i]['Id'] + "</td>";
+            str += "<td>" + data[i]['Name'] + "</td>";
+            str += "<td>" + data[i]['Gender'] + "</td>";
+            str += "<td>" + data[i]['Age'] + "</td>";
+            str += "<td>" + data[i]['Grade'] + "</td>";
+            str += "<td>" + data[i]['Tel'] + "</td>";
+            $("tbody").append("<tr>" + str + "</tr>");
+        }
+        //拖拽 
+        $("tr").mousedown(function() {
+            if (event.button == 0) {
+                $(this).addClass("c");
+            } else {
+                $(this).addClass("h").siblings("tr").removeClass("h");
+                $(window).keydown(function(e) {
+                    if (e.keyCode == 8) {
+                        $("tr.c").remove();
+                    }
+                })
+                $(window).mousemove(function(e) {
+                    $(window).mouseup(function() {
+                        $("tbody").append($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("tr").mouseup(function() {
+                        $(this).after($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("thead").mouseup(function() {
+                        $("tbody").prepend($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+
+                    $("tr.h").css({
+                        "left": e.pageX + 100,
+                        "top": e.pageY
+                    })
+                })
+            }
+        })
+    }, function() {
+        $("tr").remove();
+        for (var i = (d - 1) * amount; i < d * amount; i++) {
+            if (i < pageL * amount) {
+                for (var a = i + 1; a < d * amount; a++) {
+                    if (data[i].Id > data[a].Id) {
+                        var t = data[a];
+                        data[a] = data[i];
+                        data[i] = t;
+                    }
+                }
+            } else {
+                for (var a = i + 1; a < data.length; a++) {
+                    if (data[i].Id > data[a].Id) {
+                        var t = data[a];
+                        data[a] = data[i];
+                        data[i] = t;
+                    }
+                }
+            }
+
+
+        }
+        for (var i = (d - 1) * amount; i < d * amount; i++) {
+            var str = "<td>" + data[i]['Id'] + "</td>";
+            str += "<td>" + data[i]['Name'] + "</td>";
+            str += "<td>" + data[i]['Gender'] + "</td>";
+            str += "<td>" + data[i]['Age'] + "</td>";
+            str += "<td>" + data[i]['Grade'] + "</td>";
+            str += "<td>" + data[i]['Tel'] + "</td>";
+            $("tbody").append("<tr>" + str + "</tr>");
+        }
+        //拖拽 
+        $("tr").mousedown(function() {
+            if (event.button == 0) {
+                $(this).addClass("c");
+            } else {
+                $(this).addClass("h").siblings("tr").removeClass("h");
+                $(window).keydown(function(e) {
+                    if (e.keyCode == 8) {
+                        $("tr.c").remove();
+                    }
+                })
+                $(window).mousemove(function(e) {
+                    $(window).mouseup(function() {
+                        $("tbody").append($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("tr").mouseup(function() {
+                        $(this).after($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("thead").mouseup(function() {
+                        $("tbody").prepend($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+
+                    $("tr.h").css({
+                        "left": e.pageX + 100,
+                        "top": e.pageY
+                    })
+                })
+            }
+
+
+        })
+    })
+
+    //以上为未发生页面显示数量改变功能 
+
+    //页面显示个数按钮修改
+    $(".page").val(amount);
+    $(".change").click(function() {
+        amount++;
+        $(".page").val(amount);
+        pageT = Math.ceil(j / amount); //取最大页数 floor最小
+        $(".pagenum").remove();
+        if (pageT < 5) {
+            for (s = 1; s <= pageT; s++) {
+                $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+            }
+        } else {
+            for (s = 1; s < 3; s++) {
+                $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+            }
+            for (s = 3; s < pageT - 1; s++) {
+                $(".tabs-detail").append("<div class=\"pagenum hide\">" + "" + "</div>");
+            }
+            for (s = pageT - 1; s <= pageT; s++) {
+                $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+            }
+        }
+        $("tr").remove(); //移除之前的tr重新遍历
+        for (b = 0; b < amount; b++) {
+            var str = "<td>" + data[b]['Id'] + "</td>";
+            str += "<td>" + data[b]['Name'] + "</td>";
+            str += "<td>" + data[b]['Gender'] + "</td>";
+            str += "<td>" + data[b]['Age'] + "</td>";
+            str += "<td>" + data[b]['Grade'] + "</td>";
+            str += "<td>" + data[b]['Tel'] + "</td>";
+            $("tbody").append("<tr>" + str + "</tr>");
+        }
+        $(".pagenum").eq(0).addClass("h");
+        $(".pagenum").click(function() { //点击数字跳转页面 
+            d = $(this).html(); //获取当前也数值
+            console.log(d);
+            $("tr").remove();
+            for (b = 0; b < data.length; b++) {
+                if (b >= (d - 1) * amount && b < (d) * amount) {
+                    var str = "<td>" + data[b]['Id'] + "</td>";
+                    str += "<td>" + data[b]['Name'] + "</td>";
+                    str += "<td>" + data[b]['Gender'] + "</td>";
+                    str += "<td>" + data[b]['Age'] + "</td>";
+                    str += "<td>" + data[b]['Grade'] + "</td>";
+                    str += "<td>" + data[b]['Tel'] + "</td>";
+                    $("tbody").append("<tr>" + str + "</tr>");
+                }
+            }
+            $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        })
+        var d = $(this).index() + 1; //d 当前页数值
+        $(".next").click(function() { //下一页
+            if (d < pageT) {
+                d++;
+            } else {
+                d = pageT;
+            }
+            $("tr").remove();
+            for (b = 0; b < data.length; b++) {
+                if (b >= (d - 1) * amount && b < d * amount) {
+                    var str = "<td>" + data[b]['Id'] + "</td>";
+                    str += "<td>" + data[b]['Name'] + "</td>";
+                    str += "<td>" + data[b]['Gender'] + "</td>";
+                    str += "<td>" + data[b]['Age'] + "</td>";
+                    str += "<td>" + data[b]['Grade'] + "</td>";
+                    str += "<td>" + data[b]['Tel'] + "</td>";
+                    $("tbody").append("<tr>" + str + "</tr>");
+                }
+            }
+            $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        })
+        $(".back").click(function() { //上一页
+            if (d > 1) {
+                d--;
+            } else {
+                d = 1;
+            }
+            $("tr").remove();
+            for (b = 0; b < data.length; b++) {
+                if (b >= (d - 1) * amount && b < d * amount) {
+                    var str = "<td>" + data[b]['Id'] + "</td>";
+                    str += "<td>" + data[b]['Name'] + "</td>";
+                    str += "<td>" + data[b]['Gender'] + "</td>";
+                    str += "<td>" + data[b]['Age'] + "</td>";
+                    str += "<td>" + data[b]['Grade'] + "</td>";
+                    str += "<td>" + data[b]['Tel'] + "</td>";
+                    $("tbody").append("<tr>" + str + "</tr>");
+                }
+            }
+            $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        })
+        //拖拽 
+        $("tr").mousedown(function() {
+            if (event.button == 0) {
+                $(this).addClass("c");
+            } else {
+                $(this).addClass("h").siblings("tr").removeClass("h");
+                $(window).keydown(function(e) {
+                    if (e.keyCode == 8) {
+                        $("tr.c").remove();
+                    }
+                })
+                $(window).mousemove(function(e) {
+                    $(window).mouseup(function() {
+                        $("tbody").append($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("tr").mouseup(function() {
+                        $(this).after($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+                    $("thead").mouseup(function() {
+                        $("tbody").prepend($("tr.h"));
+                        $("tr.h").removeClass("h");
+                    })
+
+                    $("tr.h").css({
+                        "left": e.pageX + 100,
+                        "top": e.pageY
+                    })
+                })
+            }
+
+
+        })
+        //反向排序
+        $("thead th").eq(0).toggle(function() {
+            $("tr").remove();
+            console.log(d);
+            for (var i = (d - 2) * amount; i < (d - 1) * amount; i++) {
+                if (i < pageL * amount) {
+                    for (var a = i + 1; a < (d - 1) * amount; a++) {
+                        if (data[i].Id < data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                } else {
+                    for (var a = i + 1; a < data.length; a++) {
+                        if (data[i].Id < data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                }
+
+
+            }
+            for (var i = (d - 2) * amount; i < (d - 1) * amount; i++) {
+                var str = "<td>" + data[i]['Id'] + "</td>";
+                str += "<td>" + data[i]['Name'] + "</td>";
+                str += "<td>" + data[i]['Gender'] + "</td>";
+                str += "<td>" + data[i]['Age'] + "</td>";
+                str += "<td>" + data[i]['Grade'] + "</td>";
+                str += "<td>" + data[i]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        }, function() {
+            $("tr").remove();
+            for (var i = (d - 1) * amount; i < d * amount; i++) {
+                if (i < pageL * amount) {
+                    for (var a = i + 1; a < d * amount; a++) {
+                        if (data[i].Id > data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                } else {
+                    for (var a = i + 1; a < data.length; a++) {
+                        if (data[i].Id > data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                }
+
+
+            }
+            for (var i = (d - 1) * amount; i < d * amount; i++) {
+                var str = "<td>" + data[i]['Id'] + "</td>";
+                str += "<td>" + data[i]['Name'] + "</td>";
+                str += "<td>" + data[i]['Gender'] + "</td>";
+                str += "<td>" + data[i]['Age'] + "</td>";
+                str += "<td>" + data[i]['Grade'] + "</td>";
+                str += "<td>" + data[i]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        }, function() {
+            $("tr").remove();
+            for (var i = (d - 2) * amount; i < (d - 1) * amount; i++) {
+                if (i < pageL * amount) {
+                    for (var a = i + 1; a < (d - 1) * amount; a++) {
+                        if (data[i].Id > data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                } else {
+                    for (var a = i + 1; a < data.length; a++) {
+                        if (data[i].Id > data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                }
+
+
+            }
+            for (var i = (d - 2) * amount; i < (d - 1) * amount; i++) {
+                var str = "<td>" + data[i]['Id'] + "</td>";
+                str += "<td>" + data[i]['Name'] + "</td>";
+                str += "<td>" + data[i]['Gender'] + "</td>";
+                str += "<td>" + data[i]['Age'] + "</td>";
+                str += "<td>" + data[i]['Grade'] + "</td>";
+                str += "<td>" + data[i]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        }, function() {
+            $("tr").remove();
+            for (var i = (d - 1) * amount; i < d * amount; i++) {
+                if (i < pageL * amount) {
+                    for (var a = i + 1; a < d * amount; a++) {
+                        if (data[i].Id > data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                } else {
+                    for (var a = i + 1; a < data.length; a++) {
+                        if (data[i].Id > data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                }
+
+
+            }
+            for (var i = (d - 1) * amount; i < d * amount; i++) {
+                var str = "<td>" + data[i]['Id'] + "</td>";
+                str += "<td>" + data[i]['Name'] + "</td>";
+                str += "<td>" + data[i]['Gender'] + "</td>";
+                str += "<td>" + data[i]['Age'] + "</td>";
+                str += "<td>" + data[i]['Grade'] + "</td>";
+                str += "<td>" + data[i]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        })
+    })
+
+    //调整每页显示个数
+    $(".page").blur(function() { //失去焦点时完成每页个数显示
+
+        if ($(".page").val() == "" || $(".page").val() == 0) {
+            amount = 10
+        } else {
+            amount = $(".page").val()
+        }
+        pageT = Math.ceil(j / amount); //取最大页数 floor最小
+        $(".pagenum").remove();
+        if (pageT < 5) {
+            for (s = 1; s <= pageT; s++) {
+                $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+            }
+        } else {
+            for (s = 1; s < 3; s++) {
+                $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+            }
+            for (s = 3; s < pageT - 1; s++) {
+                $(".tabs-detail").append("<div class=\"pagenum hide\">" + "" + "</div>");
+            }
+            for (s = pageT - 1; s <= pageT; s++) {
+                $(".tabs-detail").append("<div class=\"pagenum\">" + s + "</div>");
+            }
+        }
+        $("tr").remove(); //移除之前的tr重新遍历
+        for (b = 0; b < amount; b++) {
+            var str = "<td>" + data[b]['Id'] + "</td>";
+            str += "<td>" + data[b]['Name'] + "</td>";
+            str += "<td>" + data[b]['Gender'] + "</td>";
+            str += "<td>" + data[b]['Age'] + "</td>";
+            str += "<td>" + data[b]['Grade'] + "</td>";
+            str += "<td>" + data[b]['Tel'] + "</td>";
+            $("tbody").append("<tr>" + str + "</tr>");
+        }
+        $(".pagenum").eq(0).addClass("h");
+        $(".pagenum").click(function() { //点击数字跳转页面 
+            d = $(this).html(); //获取当前也数值
+            console.log(d);
+            $("tr").remove();
+            for (b = 0; b < data.length; b++) {
+                if (b >= (d - 1) * amount && b < (d) * amount) {
+                    var str = "<td>" + data[b]['Id'] + "</td>";
+                    str += "<td>" + data[b]['Name'] + "</td>";
+                    str += "<td>" + data[b]['Gender'] + "</td>";
+                    str += "<td>" + data[b]['Age'] + "</td>";
+                    str += "<td>" + data[b]['Grade'] + "</td>";
+                    str += "<td>" + data[b]['Tel'] + "</td>";
+                    $("tbody").append("<tr>" + str + "</tr>");
+                }
+            }
+            $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+            })
+        })
+        var d = $(this).index() + 1; //d 当前页数值
+        $(".next").click(function() { //下一页
+            if (d < pageT) {
+                d++;
+            } else {
+                d = pageT;
+            }
+            $("tr").remove();
+            for (b = 0; b < data.length; b++) {
+                if (b >= (d - 1) * amount && b < d * amount) {
+                    var str = "<td>" + data[b]['Id'] + "</td>";
+                    str += "<td>" + data[b]['Name'] + "</td>";
+                    str += "<td>" + data[b]['Gender'] + "</td>";
+                    str += "<td>" + data[b]['Age'] + "</td>";
+                    str += "<td>" + data[b]['Grade'] + "</td>";
+                    str += "<td>" + data[b]['Tel'] + "</td>";
+                    $("tbody").append("<tr>" + str + "</tr>");
+                }
+            }
+            $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        })
+        $(".back").click(function() { //上一页
+            if (d > 1) {
+                d--;
+            } else {
+                d = 1;
+            }
+            $("tr").remove();
+            for (b = 0; b < data.length; b++) {
+                if (b >= (d - 1) * amount && b < d * amount) {
+                    var str = "<td>" + data[b]['Id'] + "</td>";
+                    str += "<td>" + data[b]['Name'] + "</td>";
+                    str += "<td>" + data[b]['Gender'] + "</td>";
+                    str += "<td>" + data[b]['Age'] + "</td>";
+                    str += "<td>" + data[b]['Grade'] + "</td>";
+                    str += "<td>" + data[b]['Tel'] + "</td>";
+                    $("tbody").append("<tr>" + str + "</tr>");
+                }
+            }
+            $(".pagenum").eq(d - 1).addClass("h").siblings(".pagenum").removeClass("h");
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+            })
+        })
+        $("tr").mousedown(function() {
+            $(this).addClass("h").siblings("tr").removeClass("h");
+            $(window).mousemove(function(e) {
+                $(window).mouseup(function() {
+                    $("tbody").append($("tr.h"));
+                    $("tr.h").removeClass("h");
+                })
+                $("tr").mouseup(function() {
+                    $(this).after($("tr.h"));
+                    $("tr.h").removeClass("h");
+                })
+                $("thead").mouseup(function() {
+                    $("tbody").prepend($("tr.h"));
+                    $("tr.h").removeClass("h");
+                })
+
+                $("tr.h").css({
+                    "left": e.pageX + 100,
+                    "top": e.pageY
+                })
+            })
+        })
+        //反向排序
+        $("thead th").eq(0).toggle(function() {
+            $("tr").remove();
+            for (var i = (d - 1) * amount; i < d * amount; i++) {
+                if (i < pageL * amount) {
+                    for (var a = i + 1; a < d * amount; a++) {
+                        if (data[i].Id < data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                } else {
+                    for (var a = i + 1; a < data.length; a++) {
+                        if (data[i].Id < data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                }
+            }
+            for (var i = (d - 1) * amount; i < d * amount; i++) {
+                var str = "<td>" + data[i]['Id'] + "</td>";
+                str += "<td>" + data[i]['Name'] + "</td>";
+                str += "<td>" + data[i]['Gender'] + "</td>";
+                str += "<td>" + data[i]['Age'] + "</td>";
+                str += "<td>" + data[i]['Grade'] + "</td>";
+                str += "<td>" + data[i]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        }, function() {
+            $("tr").remove();
+            for (var i = (d - 1) * amount; i < d * amount; i++) {
+                if (i < pageL * amount) {
+                    for (var a = i + 1; a < d * amount; a++) {
+                        if (data[i].Id > data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                } else {
+                    for (var a = i + 1; a < data.length; a++) {
+                        if (data[i].Id > data[a].Id) {
+                            var t = data[a];
+                            data[a] = data[i];
+                            data[i] = t;
+                        }
+                    }
+                }
+
+
+            }
+            for (var i = (d - 1) * amount; i < d * amount; i++) {
+                var str = "<td>" + data[i]['Id'] + "</td>";
+                str += "<td>" + data[i]['Name'] + "</td>";
+                str += "<td>" + data[i]['Gender'] + "</td>";
+                str += "<td>" + data[i]['Age'] + "</td>";
+                str += "<td>" + data[i]['Grade'] + "</td>";
+                str += "<td>" + data[i]['Tel'] + "</td>";
+                $("tbody").append("<tr>" + str + "</tr>");
+            }
+            //拖拽 
+            $("tr").mousedown(function() {
+                if (event.button == 0) {
+                    $(this).addClass("c");
+                } else {
+                    $(this).addClass("h").siblings("tr").removeClass("h");
+                    $(window).keydown(function(e) {
+                        if (e.keyCode == 8) {
+                            $("tr.c").remove();
+                        }
+                    })
+                    $(window).mousemove(function(e) {
+                        $(window).mouseup(function() {
+                            $("tbody").append($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("tr").mouseup(function() {
+                            $(this).after($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+                        $("thead").mouseup(function() {
+                            $("tbody").prepend($("tr.h"));
+                            $("tr.h").removeClass("h");
+                        })
+
+                        $("tr.h").css({
+                            "left": e.pageX + 100,
+                            "top": e.pageY
+                        })
+                    })
+                }
+
+
+            })
+        })
+        //            })
+
+    })
+</script>

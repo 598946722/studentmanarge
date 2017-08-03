@@ -1,0 +1,102 @@
+.login {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  position: relative; }
+  .login .content {
+    width: 200px;
+    height: 100px;
+    border-radius: 20px;
+    background: #bbb;
+    padding: 80px 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -200px;
+    margin-top: -125px; }
+    .login .content .uname,
+    .login .content .upwd {
+      width: 65%;
+      margin: 0px auto;
+      border: 1px solid #666;
+      outline: none;
+      float: right; }
+    .login .content .reset {
+      float: right; }
+
+.main {
+  height: 100%;
+  display: none; }
+
+.nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100%;
+  background: #272634; }
+  .nav .header {
+    height: 55px;
+    background: #1e1e29;
+    margin-bottom: 10px; }
+    .nav .header .logo {
+      float: left; }
+    .nav .header .menu {
+      float: left;
+      line-height: 55px;
+      font-size: 16px;
+      color: #e9e8ee;
+      cursor: pointer;
+      font-family: 'iconfont'; }
+  .nav .min-nav {
+    padding-left: 20px;
+    background: #272634;
+    height: 40px;
+    overflow: hidden; }
+    .nav .min-nav .title {
+      font-size: 14px;
+      color: #aba9b6;
+      height: 40px;
+      line-height: 40px;
+      font-weight: 600;
+      cursor: pointer; }
+    .nav .min-nav .option {
+      color: #9797ab;
+      line-height: 30px;
+      margin: 5px 0;
+      cursor: pointer; }
+      .nav .min-nav .option .icon {
+        width: 30px;
+        height: 30px;
+        line-height: 35px;
+        text-align: center;
+        border-radius: 4px;
+        background: #1f1f2a;
+        float: left;
+        margin-right: 10px;
+        font-family: 'iconfont'; }
+      .nav .min-nav .option .right {
+        float: right;
+        margin-right: 25px;
+        line-height: 30px;
+        font-family: 'iconfont'; }
+    .nav .min-nav .option:nth-child(2) span {
+      color: #ffff47;
+      font-size: 24px;
+      line-height: 35px; }
+    .nav .min-nav .option:nth-child(5) span {
+      color: #ff373a;
+      font-size: 18px; }
+    .nav .min-nav .option:hover {
+      background: #1e1e29; }
+
+.iframe {
+  width: auto;
+  height: 100%;
+  margin-left: 280px;
+  background: #f4f4f4; }
+  .iframe iframe {
+    width: 100%;
+    height: 99%; }
+
+/*# sourceMappingURL=index.css.map */
